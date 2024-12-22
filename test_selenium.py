@@ -1,7 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
@@ -16,8 +15,6 @@ driver.maximize_window()
 
 expected_title = "Swag Labs"
 actual_title = driver.title
-
-# Print the page title
 print("Page Title:", driver.title)
 assert expected_title in actual_title, f"Title mismatch! Expected '{expected_title}', but got '{actual_title}'"
 print("Page title verified successfully.")
@@ -42,7 +39,7 @@ driver.find_element(By.NAME, "continue").click()
 driver.find_element(By.NAME, "finish").click()
 time.sleep(5)
 
-# Logout
+#Logout
 driver.find_element(By.ID, "react-burger-menu-btn").click()
 element = driver.find_element(By.ID, "logout_sidebar_link")
 driver.execute_script("arguments[0].scrollIntoView(true);", element)
@@ -55,13 +52,13 @@ driver.find_element(By.ID, "login-button").click()
 
 driver.find_element(By.ID, "add-to-cart-sauce-labs-bike-light").click()
 try:
-    # Wait for the cart badge to either update or disappear
+    #Wait for the cart badge to either update or disappear
     WebDriverWait(driver, 5).until(
         EC.invisibility_of_element((By.CLASS_NAME, "shopping_cart_badge"))
     )
     print("Cart badge disappeared, cart is empty.")
 except TimeoutException:
-    # If badge is still present, check its count
+    #If badge is still present, check its count
     cart_count = driver.find_element(By.CLASS_NAME, "shopping_cart_badge").text
     assert cart_count == "0", f"Expected cart count to be 0 but got {cart_count}"
 finally:
