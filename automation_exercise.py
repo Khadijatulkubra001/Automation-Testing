@@ -75,12 +75,12 @@ class TestAutomationWebsite():
         driver.find_element(By.CSS_SELECTOR, '[data-qa="login-password"]').send_keys("123Abc!")
         driver.find_element(By.CSS_SELECTOR, '[data-qa="login-button"]').click()
         EC.presence_of_element_located((By.NAME, 'Logged in as User123'))
-        #delete_link = WebDriverWait(driver, 10).until(
-        #EC.presence_of_element_located((By.CSS_SELECTOR, "a[href='/delete_account']"))
-        #)
-        #delete_link.click()
-        #EC.presence_of_element_located((By.CSS_SELECTOR, '[data-qa="account-deleted"]'))
-        #driver.find_element(By.CSS_SELECTOR, '[data-qa="continue-button"]').click()
+        delete_link = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "a[href='/delete_account']"))
+        )
+        delete_link.click()
+        EC.presence_of_element_located((By.CSS_SELECTOR, '[data-qa="account-deleted"]'))
+        driver.find_element(By.CSS_SELECTOR, '[data-qa="continue-button"]').click()
 
     def test_ViewProducts(self, setup_class):
         driver = self.driver
@@ -103,10 +103,12 @@ class TestAutomationWebsite():
         assert actual_url == expected_url, f"Expected URL: {expected_url}, but got: {actual_url}"
         driver.find_element(By.ID, "search_product").send_keys("blue top")
         driver.find_element(By.ID, "submit_search").click()
-        driver.find_element(By.CLASS_NAME, "productinfo text-center")
-        driver.find_element(By.CLASS_NAME, "btn btn-default add-to-cart").click()
+        #driver.find_element(By.CLASS_NAME, "productinfo text-center")
+        add = driver.find_element(By.CSS_SELECTOR, 'a[data-product-id="1"]')
+        driver.execute_script("arguments[0].scrollIntoView(true);", add)
+        add.click()
         driver.find_element(By.CSS_SELECTOR, 'a[href = "/view_cart"]').click()
-        driver.find_element(By.CLASS_NAME, "btn btn-default check_out").click()
+        driver.find_element(By.LINK_TEXT, "Proceed To Checkout").click()
 
 
 
