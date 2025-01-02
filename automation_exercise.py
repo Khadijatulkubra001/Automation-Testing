@@ -7,11 +7,15 @@ from selenium.common.exceptions import TimeoutException
 import pytest
 import time
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 
 @pytest.fixture(scope="class")
 def setup_class(request):
+    options = webdriver.ChromeOptions()
+    options.add_extension("C:/Users/HP/Documents/selenium/Stands AdBlocker - Chrome Web Store 2.1.34.0.crx")
     #Setup Chrome
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(options=options)
     driver.get("http://automationexercise.com/")
     driver.maximize_window()
     request.cls.driver = driver
@@ -68,28 +72,26 @@ class TestAutomationWebsite():
         except:
             print("Email Already Exists")
 
+        
+    #Test case 2: Login the user
     def test_CorrectLogin(self, setup_class):
         driver = self.driver
-        #driver.get("http://automationexercise.com/")
         driver.find_element(By.LINK_TEXT, 'Signup / Login').click()
         EC.presence_of_element_located((By.NAME, 'Login to your account'))
         driver.find_element(By.CSS_SELECTOR, '[data-qa="login-email"]').send_keys("user_test16@gmail.com")
         driver.find_element(By.CSS_SELECTOR, '[data-qa="login-password"]').send_keys("123Abc!")
         driver.find_element(By.CSS_SELECTOR, '[data-qa="login-button"]').click()
         EC.presence_of_element_located((By.NAME, 'Logged in as User123'))
-        #delete_link = WebDriverWait(driver, 10).until(
-        #EC.presence_of_element_located((By.CSS_SELECTOR, "a[href='/delete_account']"))
-        #)
-        #delete_link.click()
-        #EC.presence_of_element_located((By.CSS_SELECTOR, '[data-qa="account-deleted"]'))
-        #driver.find_element(By.CSS_SELECTOR, '[data-qa="continue-button"]').click()
 
+    #Test case 3: Go to the products page and view the first product
     def test_ViewProducts(self, setup_class):
         driver = self.driver
         driver.find_element(By.CSS_SELECTOR, "a[href='/products']").click()
         expected_url = "https://automationexercise.com/products"
         actual_url = driver.current_url
         assert actual_url == expected_url, f"Expected URL: {expected_url}, but got: {actual_url}"
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
         view_product = driver.find_element(By.CSS_SELECTOR, 'a[href ="/product_details/1"]')
         driver.execute_script("arguments[0].scrollIntoView(true);", view_product)
         view_product.click()
@@ -97,6 +99,7 @@ class TestAutomationWebsite():
         actual_url = driver.current_url
         assert actual_url == expected_url, f"Expected URL: {expected_url}, but got: {actual_url}"
 
+    #Test case 4: Search a product and add it to cart
     def test_SearchProduct(self, setup_class):
         driver = self.driver
         driver.find_element(By.CSS_SELECTOR, "a[href='/products']").click()
@@ -105,13 +108,14 @@ class TestAutomationWebsite():
         assert actual_url == expected_url, f"Expected URL: {expected_url}, but got: {actual_url}"
         driver.find_element(By.ID, "search_product").send_keys("blue top")
         driver.find_element(By.ID, "submit_search").click()
-        #driver.find_element(By.CLASS_NAME, "productinfo text-center")
         add = driver.find_element(By.CSS_SELECTOR, 'a[data-product-id="1"]')
         driver.execute_script("arguments[0].scrollIntoView(true);", add)
         add.click()
-        driver.find_element(By.CSS_SELECTOR, 'a[href = "/view_cart"]').click()
+        view_cart = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'a[href = "/view_cart"]')))
+        view_cart.click()
         driver.find_element(By.LINK_TEXT, "Proceed To Checkout").click()
 
+    #Test case 5: Checkout by adding payment details
     def test_CheckOut(self, setup_class):
         driver = self.driver
         driver.find_element(By.CSS_SELECTOR, "a[href='/payment']").click()
@@ -121,7 +125,16 @@ class TestAutomationWebsite():
         driver.find_element(By.CSS_SELECTOR, '[data-qa = "expiry-month"]').send_keys("04")
         driver.find_element(By.CSS_SELECTOR, '[data-qa = "expiry-year"]').send_keys("2026")
         driver.find_element(By.CSS_SELECTOR, '[data-qa = "pay-button"]').click()
-        
+
+    #Test case 6: Delete the user account    
+    def test_DeleteAccount(self, setup_class):
+        driver = self.driver
+        delete_link = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "a[href='/delete_account']"))
+        )
+        delete_link.click()
+        EC.presence_of_element_located((By.CSS_SELECTOR, '[data-qa="account-deleted"]'))
+        driver.find_element(By.CSS_SELECTOR, '[data-qa="continue-button"]').click()
 
 
             
